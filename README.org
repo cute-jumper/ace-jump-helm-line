@@ -7,7 +7,11 @@ This package makes use of the =avy-jump.el= provided in [[https://github.com/abo
   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
   : (require 'ace-jump-helm-line)
 
-* Demo
+* Usage
+  When in a helm session, for example, after you call =helm-M-x=, you can use
+  "C-'" to invoke =ace-jump-helm-line=. See the following demos.
+  
+* Demos
   Use =avy-jump= style to jump to a helm candidate:
   [[./screencasts/avy-jump-style.gif]]
 

@@ -33,7 +33,12 @@
 ;;   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
 ;;   : (require 'ace-jump-helm-line)
 
-;;   By default, this package uses =avy-jump= style(anyway, it uses
+;; * Usage
+;;   When in a helm session, for example, after you call =helm-M-x=, you can use
+;;   "C-'" to invoke =ace-jump-helm-line=. 
+
+;;   There are two kinds of styles: avy-jump style and ace-jump-mode style. By
+;;   default, this package uses =avy-jump= style(anyway, it uses
 ;;   =avy-jump.el=!). You can certainly change to =ace-jump-mode-style= by:
 ;;   : (setq ace-jump-helm-line-use-avy-style nil)
 

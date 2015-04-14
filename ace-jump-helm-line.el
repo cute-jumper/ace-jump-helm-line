@@ -78,7 +78,7 @@
                   #'avi--overlay-at))))
 
 (defun ace-jump-helm-line ()
-  "Jump to a line start in current buffer."
+  "Jump to a line start in helm window."
   (interactive)
   (if helm-alive-p
       (let ((orig-window (selected-window))

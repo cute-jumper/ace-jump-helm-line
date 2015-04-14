@@ -1,0 +1,23 @@
+#+TITLE: ace-jump-helm-line
+*Ace-jump to a candidate in helm window.*
+
+This package makes use of the =avy-jump.el= provided in [[https://github.com/abo-abo/ace-window/][ace-window]].
+
+* Setup
+  : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
+  : (require 'ace-jump-helm-line)
+
+* Demo
+  Use =avy-jump= style to jump to a helm candidate:
+  [[./screencasts/avy-jump-style.gif]]
+
+  Or use =ace-jump-mode= style(which should be similar as [[https://github.com/winterTTr/ace-jump-mode][ace-jump-mode]]):
+  [[./screencasts/ace-jump-mode-style.gif]]
+
+  By default, this package uses =avy-jump= style(anyway, it uses
+  =avy-jump.el=!). You can certainly change to =ace-jump-mode-style= by:
+  : (setq ace-jump-helm-line-use-avy-style nil)
+
+* Acknowledgment
+  - Thank [[https://github.com/abo-abo/ace-window/][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/ace-window/][ace-window]] package.
+  - Thank @hick for the original idea.

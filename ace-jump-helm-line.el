@@ -5,7 +5,7 @@
 ;; Author: Junpeng Qiu <qjpchmail@gmail.com>
 ;; Keywords: extensions
 ;; Version: 0.1
-;; Package-Requires: ((ace-window "0.7.1"))
+;; Package-Requires: ((ace-window "0.7.1") (helm "1.6.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@
 ;;; Code:
 
 (require 'avy-jump)
+(require 'helm)
 
 (defvar ace-jump-helm-line-use-avy-style t
   "Use `avy-jump' style when t. Otherwise use `ace-jump-mode' style.")

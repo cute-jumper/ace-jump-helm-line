@@ -33,9 +33,15 @@
 ;;   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
 ;;   : (require 'ace-jump-helm-line)
 
+;;   You can use the following code to bind =ace-jump-helm-line= to a key(say,
+;;   "C-'"):
+;;   : (eval-after-load "helm"
+;;   : '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+
+
 ;; * Usage
 ;;   When in a helm session, for example, after you call =helm-M-x=, you can use
-;;   "C-'" to invoke =ace-jump-helm-line=. 
+;;   your key binding(for example, "C-'") to invoke =ace-jump-helm-line=.
 
 ;;   There are two kinds of styles: avy-jump style and ace-jump-mode style. By
 ;;   default, this package uses =avy-jump= style(anyway, it uses
@@ -95,9 +101,6 @@
                   (helm-next-line)))))
         (select-window orig-window))
     (error "No helm session is running.")))
-
-(eval-after-load "helm"
-  '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
 (provide 'ace-jump-helm-line)
 ;;; ace-jump-helm-line.el ends here

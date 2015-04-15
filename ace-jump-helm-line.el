@@ -48,6 +48,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'avy-jump)
 (require 'helm)
 
@@ -84,7 +85,7 @@
   (if helm-alive-p
       (let ((orig-window (selected-window))
             (avi-keys (if ace-jump-helm-line-use-avy-style avi-keys
-                        (loop for i from ?a to ?z collect i))))
+                        (cl-loop for i from ?a to ?z collect i))))
         (unwind-protect
             (with-selected-window (helm-window)
               (avi--goto (ace-jump-helm-line--collect-lines))

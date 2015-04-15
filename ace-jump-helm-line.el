@@ -85,6 +85,7 @@
                       #'avi--overlay-pre
                   #'avi--overlay-at))))
 
+;;;###autoload
 (defun ace-jump-helm-line ()
   "Jump to a line start in helm window."
   (interactive)

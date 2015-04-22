@@ -9,8 +9,8 @@ This package makes use of the =avy-jump.el= provided in [[https://github.com/abo
   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
   : (require 'ace-jump-helm-line)
 
-  You can use the following code to bind =ace-jump-helm-line= to a key(say,
-  "C-'"):
+  You can use the following code to bind =ace-jump-helm-line= (or
+  =ace-jump-helm-line-execute-action=. See later) to a key(say, "C-'"):
   : (eval-after-load "helm"
   : '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
@@ -19,6 +19,10 @@ This package makes use of the =avy-jump.el= provided in [[https://github.com/abo
   your key binding(for example, "C-'") to invoke =ace-jump-helm-line=. See the
   following demos.
   
+  =ace-jump-helm-line= would just jump to that candidate in helm window. If you
+  want to jump to and automatically select the candidate, which will then quit
+  the helm session, you can bind the key to =ace-jump-helm-line-execute-action=.
+
 * Demos
   Use =avy-jump= style to jump to a helm candidate:
   [[./screencasts/avy-jump-style.gif]]

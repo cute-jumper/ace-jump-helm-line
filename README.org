@@ -1,5 +1,6 @@
 #+TITLE: ace-jump-helm-line
 [[http://melpa.org/#/ace-jump-helm-line][file:http://melpa.org/packages/ace-jump-helm-line-badge.svg]]
+[[http://stable.melpa.org/#/ace-jump-helm-line][file:http://stable.melpa.org/packages/ace-jump-helm-line-badge.svg]]
 
 *Ace-jump to a candidate in helm window.*
 

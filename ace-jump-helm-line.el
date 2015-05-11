@@ -27,7 +27,7 @@
 ;; #+TITLE: ace-jump-helm-line
 ;; *Ace-jump to a candidate in helm window.*
 
-;; This package makes use of the =avy-jump.el= provided in [[https://github.com/abo-abo/ace-window/][ace-window]].
+;; This package makes use of the =avy.el=.
 
 ;; * Setup
 ;;   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
@@ -54,7 +54,7 @@
 ;;   : (setq ace-jump-helm-line-use-avy-style nil)
 
 ;; * Acknowledgment
-;;   - Thank [[https://github.com/abo-abo/ace-window/][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/ace-window/][ace-window]] package.
+;;   - Thank [[https://github.com/abo-abo/avy][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/avy][avy]] package.
 ;;   - Thank @hick for the original idea.
 
 ;;; Code:

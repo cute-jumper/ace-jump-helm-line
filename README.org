@@ -4,7 +4,7 @@
 
 *Ace-jump to a candidate in helm window.*
 
-This package makes use of the =avy-jump.el= provided in [[https://github.com/abo-abo/ace-window/][ace-window]].
+This package makes use of the =avy.el=.
 
 * Setup
   : (add-to-list 'load-path "/path/to/ace-jump-helm-line.el")
@@ -19,7 +19,7 @@ This package makes use of the =avy-jump.el= provided in [[https://github.com/abo
   When in a helm session, for example, after you call =helm-M-x=, you can use
   your key binding(for example, "C-'") to invoke =ace-jump-helm-line=. See the
   following demos.
-  
+
   =ace-jump-helm-line= would just jump to that candidate in helm window. If you
   want to jump to and automatically select the candidate, which will then quit
   the helm session, you can bind the key to =ace-jump-helm-line-execute-action=.
@@ -36,5 +36,5 @@ This package makes use of the =avy-jump.el= provided in [[https://github.com/abo
   : (setq ace-jump-helm-line-use-avy-style nil)
 
 * Acknowledgment
-  - Thank [[https://github.com/abo-abo/ace-window/][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/ace-window/][ace-window]] package.
+  - Thank [[https://github.com/abo-abo/][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/avy][avy]] package.
   - Thank @hick for the original idea.

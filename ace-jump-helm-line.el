@@ -5,7 +5,7 @@
 ;; Author: Junpeng Qiu <qjpchmail@gmail.com>
 ;; Keywords: extensions
 ;; Version: 0.1
-;; Package-Requires: ((ace-window "0.7.1") (helm "1.6.3"))
+;; Package-Requires: ((avy "0.2.0") (helm "1.6.3") (cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'avy-jump)
+(require 'avy)
 (require 'helm)
 
 (defvar ace-jump-helm-line-use-avy-style t
@@ -68,8 +68,9 @@
 
 (defun ace-jump-helm-line--collect-lines ()
   "Select lines in helm window."
-  (let ((avi-background (if ace-jump-helm-line-use-avy-style
+  (let ((avy-background (if ace-jump-helm-line-use-avy-style
                             nil t))
+        avy-all-windows
         candidates)
     (save-excursion
       (save-restriction
@@ -85,10 +86,10 @@
           (while (or (helm-pos-header-line-p)
                      (helm-pos-candidate-separator-p))
             (forward-line 1)))))
-    (avi--process (nreverse candidates)
+    (avy--process (nreverse candidates)
                   (if ace-jump-helm-line-use-avy-style
-                      #'avi--overlay-pre
-                  #'avi--overlay-at))))
+                      #'avy--overlay-pre
+                  #'avy--overlay-at))))
 
 ;;;###autoload
 (defun ace-jump-helm-line ()
@@ -96,11 +97,11 @@
   (interactive)
   (if helm-alive-p
       (let ((orig-window (selected-window))
-            (avi-keys (if ace-jump-helm-line-use-avy-style avi-keys
+            (avy-keys (if ace-jump-helm-line-use-avy-style avy-keys
                         (cl-loop for i from ?a to ?z collect i))))
         (unwind-protect
             (with-selected-window (helm-window)
-              (avi--goto (ace-jump-helm-line--collect-lines))
+              (avy--goto (ace-jump-helm-line--collect-lines))
               (let ((orig-point (point)))
                 (helm-previous-line)
                 (unless (= (point) orig-point)

@@ -4,8 +4,8 @@
 
 ;; Author: Junpeng Qiu <qjpchmail@gmail.com>
 ;; Keywords: extensions
-;; Version: 0.1
-;; Package-Requires: ((avy "0.2.0") (helm "1.6.3") (cl-lib "0.5"))
+;; Version: 0.3.2
+;; Package-Requires: ((avy "0.2.0") (helm "1.6.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -59,7 +59,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'avy)
 (require 'helm)
 
@@ -98,7 +97,7 @@
   (if helm-alive-p
       (let ((orig-window (selected-window))
             (avy-keys (if ace-jump-helm-line-use-avy-style avy-keys
-                        (cl-loop for i from ?a to ?z collect i))))
+                        (number-sequence ?a ?z))))
         (unwind-protect
             (with-selected-window (helm-window)
               (avy--goto (ace-jump-helm-line--collect-lines))

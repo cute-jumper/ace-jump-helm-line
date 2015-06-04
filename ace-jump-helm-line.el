@@ -127,7 +127,7 @@
 
 ;;;###autoload
 (defun ace-jump-helm-line ()
-  "Jump to a line start in helm window."
+  "Jump to a line in helm window."
   (interactive)
   (if helm-alive-p
       (let ((orig-window (selected-window))
@@ -146,6 +146,7 @@
 ;;; Inspired by http://rubikitch.com/f/150416044841.ace-jump-helm-line.1.el
 ;;;###autoload
 (defun ace-jump-helm-line-execute-action ()
+  "Jump to a line and execute persistent action in helm window."
   (interactive)
   (ace-jump-helm-line)
   (helm-maybe-exit-minibuffer))

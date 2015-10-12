@@ -69,14 +69,16 @@
 ;;   can use your key binding(for example, "C-'") to invoke
 ;;   `ace-jump-helm-line'. See demos.
 
-;;   `ace-jump-helm-line' would just jump to that candidate in helm window.
-;;   If you want to jump to and automatically select the candidate, which
-;;   will then quit the helm session, you can bind the key to
-;;   `ace-jump-helm-line-execute-action'.
+;;   Two commands are available:
+;;   - `ace-jump-helm-line': Jump to a candidate in helm window. You can
+;;   still move around in the helm window after this command.
+;;   - `ace-jump-helm-line-execute-action': Jump to a candidate and
+;;   automatically select the candidate to execute the persistent action.
+;;   The helm session will end after this command.
 
-;;   There are two kinds of styles: avy-jump style and ace-jump-mode style.
-;;   By default, this package uses `avy-jump' style(anyway, it uses
-;;   `avy-jump.el'!). You can certainly change to `ace-jump-mode-style' by:
+;;   There are two kinds of styles: avy style and ace-jump-mode style.
+;;   By default, this package uses `avy' style(anyway, it uses
+;;   `avy.el'!). You can certainly change to `ace-jump-mode-style' by:
 ;;   ,----
 ;;   | (setq ace-jump-helm-line-use-avy-style nil)
 ;;   `----
@@ -142,7 +144,7 @@
                 (unless (= (point) orig-point)
                   (helm-next-line)))))
         (select-window orig-window))
-    (error "No helm session is running.")))
+    (error "No helm session is running")))
 
 ;;; Inspired by http://rubikitch.com/f/150416044841.ace-jump-helm-line.1.el
 ;;;###autoload

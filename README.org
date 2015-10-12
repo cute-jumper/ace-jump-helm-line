@@ -20,19 +20,22 @@ This package makes use of the =avy.el=.
   your key binding(for example, "C-'") to invoke =ace-jump-helm-line=. See the
   following demos.
 
-  =ace-jump-helm-line= would just jump to that candidate in helm window. If you
-  want to jump to and automatically select the candidate, which will then quit
-  the helm session, you can bind the key to =ace-jump-helm-line-execute-action=.
+  Two commands are available:
+  - =ace-jump-helm-line=: Jump to a candidate in helm window. You can still move
+    around in the helm window after this command.
+  - =ace-jump-helm-line-execute-action=: Jump to a candidate and automatically
+    select the candidate to execute the persistent action. The helm session will
+    end after this command.
 
 * Demos
-  Use =avy-jump= style to jump to a helm candidate:
+  Use =avy= style to jump to a helm candidate:
   [[./screencasts/avy-jump-style.gif]]
 
   Or use =ace-jump-mode= style(which should be similar as [[https://github.com/winterTTr/ace-jump-mode][ace-jump-mode]]):
   [[./screencasts/ace-jump-mode-style.gif]]
 
-  By default, this package uses =avy-jump= style(anyway, it uses
-  =avy-jump.el=!). You can certainly change to =ace-jump-mode-style= by:
+  By default, this package uses =avy= style(anyway, it uses =avy.el=!). You can
+  certainly change to =ace-jump-mode-style= by:
   : (setq ace-jump-helm-line-use-avy-style nil)
 
 * Acknowledgment

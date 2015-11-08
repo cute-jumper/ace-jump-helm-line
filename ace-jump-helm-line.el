@@ -83,6 +83,20 @@
 ;;   | (setq ace-jump-helm-line-use-avy-style nil)
 ;;   `----
 
+;;   *UPDATE(11/08/2015)*: As `avy' has a way to configure the keys and
+;;   styles for the `avy-*' commands(see `avy-keys-alist' and
+;;   `avy-styles-alist'), I add following three variables:
+;;   1. `ace-jump-helm-line-keys': You can set the keys to be used for
+;;   `ace-jump-helm-line'.
+;;   2. `ace-jump-helm-line-style': You can set the styles to be used for
+;;   `ace-jump-helm-line'. The values can be `pre', `at', `at-full',
+;;   `post', and `de-bruijn', the same as `avy-style'.
+;;   3. `ace-jump-helm-line-background': Whether you want to use a background
+;;   or not.
+
+;;   You can set the values of the above three variables to overwrite the
+;;   effect of `ace-jump-helm-line-use-avy-style'.
+;;   `ace-jump-helm-line-use-avy-style' is *obsolete* now!
 
 ;; 3 Acknowledgment
 ;; ================

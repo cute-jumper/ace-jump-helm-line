@@ -176,5 +176,7 @@
   (ace-jump-helm-line)
   (helm-maybe-exit-minibuffer))
 
+(make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
+
 (provide 'ace-jump-helm-line)
 ;;; ace-jump-helm-line.el ends here

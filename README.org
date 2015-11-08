@@ -11,13 +11,13 @@ This package makes use of the =avy.el=.
   : (require 'ace-jump-helm-line)
 
   You can use the following code to bind =ace-jump-helm-line= (or
-  =ace-jump-helm-line-execute-action=. See later) to a key(say, "C-'"):
+  =ace-jump-helm-line-execute-action=. See later) to a key(say, @@html:<kbd>@@C-'@@html:</kbd>@@):
   : (eval-after-load "helm"
   : '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
 
 * Usage
   When in a helm session, for example, after you call =helm-M-x=, you can use
-  your key binding(for example, "C-'") to invoke =ace-jump-helm-line=. See the
+  your key binding(for example, @@html:<kbd>@@C-'@@html:</kbd>@@) to invoke =ace-jump-helm-line=. See the
   following demos.
 
   Two commands are available:

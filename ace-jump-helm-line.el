@@ -138,7 +138,7 @@
                         (number-sequence ?a ?z))))
         (unwind-protect
             (with-selected-window (helm-window)
-              (avy--goto (ace-jump-helm-line--collect-lines))
+              (ace-jump-helm-line--collect-lines)
               (let ((orig-point (point)))
                 (helm-previous-line)
                 (unless (= (point) orig-point)

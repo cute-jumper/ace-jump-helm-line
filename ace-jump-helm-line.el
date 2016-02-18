@@ -120,8 +120,9 @@
           (push (cons (point) (selected-window))
                 candidates)
           (forward-line 1)
-          (while (or (helm-pos-header-line-p)
-                     (helm-pos-candidate-separator-p))
+          (while (and (or (helm-pos-header-line-p)
+                          (helm-pos-candidate-separator-p))
+                      (< (point) (point-max)))
             (forward-line 1)))))
     (avy--process (nreverse candidates)
                   (if ace-jump-helm-line-use-avy-style

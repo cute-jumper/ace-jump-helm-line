@@ -116,21 +116,21 @@
 
 (defvar ace-jump-helm-line-keys nil
   "Keys used for `ace-jump-helm-line'.")
-(defvar ace-jump-helm-line-style nil
+(defvar ace-jump-helm-line-style 'pre
   "Style used for `ace-jump-helm-line'.")
 (defvar ace-jump-helm-line-background nil
   "Use background or not in `ace-jump-helm-line'.")
 
 (defvar ace-jump-helm-line-use-avy-style t
-  "Use `avy-jump' style when t. Otherwise use `ace-jump-mode' style.")
+  "Useless variable since v0.4.
+Please set `ace-jump-helm-line-keys', `ace-jump-helm-line-style'
+and `ace-jump-helm-line-background' instead.")
 
 (defun ace-jump-helm-line--collect-lines ()
   "Select lines in helm window."
-  (let ((avy-background (or ace-jump-helm-line-background
-                            (not ace-jump-helm-line-use-avy-style)))
+  (let ((avy-background ace-jump-helm-line-background)
         (avy-keys (or ace-jump-helm-line-keys
-                      (if ace-jump-helm-line-use-avy-style avy-keys
-                        (number-sequence ?a ?z))))
+                      avy-keys))
         avy-all-windows
         candidates)
     (save-excursion
@@ -151,7 +151,7 @@
     (avy--process (nreverse candidates)
                   (avy--style-fn
                    (or ace-jump-helm-line-style
-                       (if ace-jump-helm-line-use-avy-style 'pre 'at))))))
+                       avy-style)))))
 
 ;;;###autoload
 (defun ace-jump-helm-line ()

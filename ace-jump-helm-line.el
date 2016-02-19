@@ -161,11 +161,11 @@
       (let ((orig-window (selected-window)))
         (unwind-protect
             (with-selected-window (helm-window)
-              (avy--goto (ace-jump-helm-line--collect-lines))
+              (ace-jump-helm-line--collect-lines)
               (let ((orig-point (point)))
-                (helm-previous-line)
+                (helm-move-selection-common :where 'line :direction 'previous)
                 (unless (= (point) orig-point)
-                  (helm-next-line)))))
+                  (helm-move-selection-common :where 'line :direction 'next)))))
         (select-window orig-window))
     (error "No helm session is running")))
 

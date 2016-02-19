@@ -37,10 +37,8 @@ This package makes use of the =avy.el=.
   3. =ace-jump-helm-line-background=: Whether you want to use a background or
      not. The default value is =nil=.
 
-  If you use the old-fashioned variable =ace-jump-helm-line-use-avy-style=, use
-  the previous three variables to achieve the same effect. Basically, if you
-  want to achieve the same effect of =(setq ace-jump-helm-line-use-avy-style
-  nil)=, use the following code:
+  For old version users: if you want to achieve the same effect of =(setq
+  ace-jump-helm-line-use-avy-style nil)=, use the following code:
   : (setq ace-jump-helm-line-keys (number-sequence ?a ?z))
   : (setq ace-jump-helm-line-style 'at)
   : (setq ace-jump-helm-line-background t)
@@ -98,6 +96,11 @@ This package makes use of the =avy.el=.
   : (setq ace-jump-helm-line-default-action 'select)
 
 * Example settings
+  : (eval-after-load "helm"
+  : '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+  : ;; or if using key-chord-mode
+  : ;; (eval-after-load "helm"
+  : ;;  '(key-chord-define helm-map "jj" 'ace-jump-helm-line))
   : (setq ace-jump-helm-line-style 'pre)
   : (setq ace-jump-helm-line-background t)
   : (setq ace-jump-helm-line-default-action 'select)
@@ -124,7 +127,7 @@ This package makes use of the =avy.el=.
   =helm-linum-relative-mode= to =linum-relative=. You can take a look if you
   don't like =avy= and want to find an alternative. As a heavy user of =avy=, I
   don't find the way that =helm-linum-relative-mode= provides very appealing.
-  Thanks to =avy, this package provides more customizations and more consistent
+  Thanks to =avy=, this package provides more customizations and more consistent
   user experience for =avy= users.
 
 * Acknowledgment

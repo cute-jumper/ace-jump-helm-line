@@ -40,7 +40,8 @@
 ;; .. 2.2 Different Actions: move-only, persistent or select
 ;; 3 Example settings
 ;; 4 Demos(only showing the basic feature)
-;; 5 Acknowledgment
+;; 5 Similar Package
+;; 6 Acknowledgment
 
 
 ;; [[file:http://melpa.org/packages/ace-jump-helm-line-badge.svg]]
@@ -103,11 +104,9 @@
 ;;   3. `ace-jump-helm-line-background': Whether you want to use a
 ;;      background or not. The default value is `nil'.
 
-;;   If you use the old-fashioned variable
-;;   `ace-jump-helm-line-use-avy-style', use the previous three variables
-;;   to achieve the same effect. Basically, if you want to achieve the same
-;;   effect of `(setq ace-jump-helm-line-use-avy-style nil)', use the
-;;   following code:
+;;   For old version users: if you want to achieve the same effect of
+;;     `(setq ace-jump-helm-line-use-avy-style nil)', use the following
+;;     code:
 ;;   ,----
 ;;   | (setq ace-jump-helm-line-keys (number-sequence ?a ?z))
 ;;   | (setq ace-jump-helm-line-style 'at)
@@ -177,6 +176,11 @@
 ;; ==================
 
 ;;   ,----
+;;   | (eval-after-load "helm"
+;;   | '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))
+;;   | ;; or if using key-chord-mode
+;;   | ;; (eval-after-load "helm"
+;;   | ;;  '(key-chord-define helm-map "jj" 'ace-jump-helm-line))
 ;;   | (setq ace-jump-helm-line-style 'pre)
 ;;   | (setq ace-jump-helm-line-background t)
 ;;   | (setq ace-jump-helm-line-default-action 'select)
@@ -204,7 +208,21 @@
 ;;   The new features after v0.4 are not recorded yet.:-(
 
 
-;; 5 Acknowledgment
+;; 5 Similar Package
+;; =================
+
+;;   [This issue of Helm] has been solved by adding a new minor mode
+;;   `helm-linum-relative-mode' to `linum-relative'. You can take a look if
+;;   you don't like `avy' and want to find an alternative. As a heavy user
+;;   of `avy', I don't find the way that `helm-linum-relative-mode'
+;;   provides very appealing. Thanks to `avy', this package provides more
+;;   customizations and more consistent user experience for `avy' users.
+
+
+;;   [This issue of Helm] https://github.com/emacs-helm/helm/issues/1257
+
+
+;; 6 Acknowledgment
 ;; ================
 
 ;;   - Thank [Oleh Krehel] for the awesome [avy] package.

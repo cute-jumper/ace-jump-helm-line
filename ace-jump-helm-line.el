@@ -264,6 +264,9 @@ Used for `ace-jump-helm-line'.")
 (defvar ace-jump-helm-line-default-action nil
   "The default action when jumping to a candidate.")
 
+(defvar ace-jump-helm-line-idle-delay 1
+  "The delay to trigger automatic `ace-jump-helm-line'.")
+
 (defvar ace-jump-helm-line--action-type nil)
 
 (defun ace-jump-helm-line-action-persistent (pt)
@@ -352,6 +355,32 @@ Used for `ace-jump-helm-line'.")
         ((eq ace-jump-helm-line-default-action 'persistent)
          (helm-execute-persistent-action)))))
 
+(defmacro ace-jump-helm-line--with-helm-minibuffer-setup-hook (fun &rest body)
+  "Temporarily add FUN to `helm-minibuffer-set-up-hook' while executing BODY."
+  (declare (indent 1) (debug t))
+  (let ((hook (make-symbol "setup-hook")))
+    `(let (,hook)
+       (setq ,hook
+             (lambda ()
+               (remove-hook 'helm-minibuffer-set-up-hook ,hook)
+               (funcall ,fun)))
+       (unwind-protect
+           (progn
+             (add-hook 'helm-minibuffer-set-up-hook ,hook)
+             ,@body)
+         (remove-hook 'helm-minibuffer-set-up-hook ,hook)))))
+
+(defun ace-jump-helm-line--do-if-empty ()
+  (when (string-equal (minibuffer-contents) "")
+    (ace-jump-helm-line)))
+
+(defun ace-jump-helm-line--maybe (orig-func &rest args)
+  (ace-jump-helm-line--with-helm-minibuffer-setup-hook
+      (lambda ()
+        (run-at-time ace-jump-helm-line-idle-delay nil
+                     #'ace-jump-helm-line--do-if-empty))
+    (apply orig-func args)))
+
 ;;;###autoload
 (defun ace-jump-helm-line ()
   "Jump to a candidate and execute the default action."
@@ -370,6 +399,14 @@ Used for `ace-jump-helm-line'.")
 
 ;;;###autoload
 (defalias 'ace-jump-helm-line-execute-action 'ace-jump-helm-line-and-select)
+
+;;;###autoload
+(defun ace-jump-helm-line-idle-exec-add (func)
+  (advice-add func :around #'ace-jump-helm-line--maybe))
+
+;;;###autoload
+(defun ace-jump-helm-line-idle-exec-remove (func)
+  (advice-remove func #'ace-jump-helm-line--maybe))
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

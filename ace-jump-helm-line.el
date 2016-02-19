@@ -116,7 +116,7 @@
 
 (defvar ace-jump-helm-line-keys nil
   "Keys used for `ace-jump-helm-line'.")
-(defvar ace-jump-helm-line-style 'pre
+(defvar ace-jump-helm-line-style nil
   "Style used for `ace-jump-helm-line'.")
 (defvar ace-jump-helm-line-background nil
   "Use background or not in `ace-jump-helm-line'.")
@@ -244,6 +244,7 @@ Used for `ace-jump-helm-line'.")
   (let ((ace-jump-helm-line-default-action 'select))
     (ace-jump-helm-line)))
 
+;;;###autoload
 (defalias 'ace-jump-helm-line-execute-action 'ace-jump-helm-line-and-select)
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")

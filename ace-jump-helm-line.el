@@ -38,6 +38,7 @@
 ;; 2 Usage
 ;; .. 2.1 Keys & UI
 ;; .. 2.2 Different Actions: move-only, persistent or select
+;; .. 2.3 Automatic Idle Execution
 ;; 3 Example settings
 ;; 4 Demos(only showing the basic feature)
 ;; 5 Similar Package
@@ -172,6 +173,30 @@
 ;;   `----
 
 
+;; 2.3 Automatic Idle Execution
+;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+;;   `ace-jump-helm-line' can be automatically executed if there is no
+;;   input after the user launches a helm command. The delay can be
+;;   xspecified by setting the variable `ace-jump-helm-line-idle-delay' in
+;;   seconds. The default value is 1.
+
+;;   Use the following code to enable this feature for a helm command, say,
+;;   `helm-mini':
+;;   ,----
+;;   | (ace-jump-helm-line-idle-exec-add 'helm-mini)
+;;   `----
+
+;;   After adding this setting, `ace-jump-helm-line' will be automatically
+;;   triggerred if there is no input for `ace-jump-helm-line-idle-delay'
+;;   seconds after `helm-mini' is called.
+
+;;   To remove it, use:
+;;   ,----
+;;   | (ace-jump-helm-line-idle-exec-remove 'helm-mini)
+;;   `----
+
+
 ;; 3 Example settings
 ;; ==================
 
@@ -188,6 +213,8 @@
 ;;   | (setq ace-jump-helm-line-select-key ?e)
 ;;   | (setq ace-jump-helm-line-move-only-key ?o)
 ;;   | (setq ace-jump-helm-line-persistent-key ?p)
+;;   | ;; enable idle execution for `helm-mini'
+;;   | (ace-jump-helm-line-idle-exec-add 'helm-mini)
 ;;   `----
 
 

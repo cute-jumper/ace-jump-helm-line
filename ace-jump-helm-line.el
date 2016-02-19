@@ -178,7 +178,7 @@
 
 ;;   `ace-jump-helm-line' can be automatically executed if there is no
 ;;   input after the user launches a helm command. The delay can be
-;;   xspecified by setting the variable `ace-jump-helm-line-idle-delay' in
+;;   specified by setting the variable `ace-jump-helm-line-idle-delay' in
 ;;   seconds. The default value is 1.
 
 ;;   Use the following code to enable this feature for a helm command, say,

@@ -196,6 +196,12 @@
 ;;   | (ace-jump-helm-line-idle-exec-remove 'helm-mini)
 ;;   `----
 
+;;   Note this feature is *experimental*. Please file an issue if you find
+;;   any problems. As I couldn't find good documentation about adding hooks
+;;   to a helm command, the implementation is a simple yet dirty hack. And
+;;   don't try to set the value of `ace-jump-helm-line-idle-delay' to be
+;;   `nil'. It doesn't work.
+
 
 ;; 3 Example settings
 ;; ==================

@@ -119,6 +119,14 @@ This package makes use of the =avy.el=.
 
   The new features after v0.4 are not recorded yet.:-(
 
+* Similar Package
+  [[https://github.com/emacs-helm/helm/issues/1257][This issue of Helm]] has been solved by adding a new minor mode
+  =helm-linum-relative-mode= to =linum-relative=. You can take a look if you
+  don't like =avy= and want to find an alternative. As a heavy user of =avy=, I
+  don't find the way that =helm-linum-relative-mode= provides very appealing.
+  Thanks to =avy, this package provides more customizations and more consistent
+  user experience for =avy= users.
+
 * Acknowledgment
   - Thank [[https://github.com/abo-abo/][Oleh Krehel]] for the awesome [[https://github.com/abo-abo/avy][avy]] package.
   - Thank @hick for the original idea.

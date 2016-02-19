@@ -6,7 +6,7 @@
 ;; URL: https://github.com/cute-jumper/ace-jump-helm-line
 ;; Keywords: extensions
 ;; Version: 0.3.2
-;; Package-Requires: ((avy "0.2.0") (helm "1.6.3"))
+;; Package-Requires: ((avy "0.4.0") (helm "1.6.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -126,13 +126,61 @@
 Please set `ace-jump-helm-line-keys', `ace-jump-helm-line-style'
 and `ace-jump-helm-line-background' instead.")
 
+(defvar ace-jump-helm-line-persistent-key nil
+  "The key to perform persistent action.")
+
+(defvar ace-jump-helm-line-select-key nil
+  "The key to select.
+Used for `ace-jump-helm-line'.")
+
+(defvar ace-jump-helm-line-move-only-key nil
+  "The key to only move the selection.
+ Used for `ace-jump-helm-line-and-select'.")
+
+(defvar ace-jump-helm-line-default-action nil
+  "The default action when jumping to a candidate.")
+
+(defvar ace-jump-helm-line--action-type nil)
+
+(defun ace-jump-helm-line-action-persistent (pt)
+  (goto-char pt)
+  (setq ace-jump-helm-line--action-type 'persistent)
+  (ace-jump-helm-line--move-selection)
+  (helm-execute-persistent-action))
+
+(defun ace-jump-helm-line-action-select (pt)
+  (goto-char pt)
+  (setq ace-jump-helm-line--action-type 'select)
+  (ace-jump-helm-line--move-selection)
+  (helm-exit-minibuffer))
+
+(defun ace-jump-helm-line-action-move-only (pt)
+  (goto-char pt)
+  (setq ace-jump-helm-line--action-type 'move-only)
+  (ace-jump-helm-line--move-selection))
+
+(defun ace-jump-helm-line--move-selection ()
+  (let ((orig-point (point)))
+    (helm-move-selection-common :where 'line :direction 'previous)
+    (unless (= (point) orig-point)
+      (helm-move-selection-common :where 'line :direction 'next))))
+
+(defun ace-jump-helm-line--get-dispatch-alist ()
+  (when (boundp 'avy-dispatch-alist)
+    (let* ((default-action (or ace-jump-helm-line-default-action
+                               'move-only))
+           (full-list (list 'persistent 'select 'move-only))
+           (action-list (delete default-action full-list))
+           dispatch-alist)
+      (dolist (w action-list dispatch-alist)
+        (let ((key-sym (intern (format "ace-jump-helm-line-%s-key" w)))
+              (action-sym (intern (format "ace-jump-helm-line-action-%s" w))))
+          (eval `(and ,key-sym
+                      (push (cons ,key-sym ',action-sym) dispatch-alist))))))))
+
 (defun ace-jump-helm-line--collect-lines ()
   "Select lines in helm window."
-  (let ((avy-background ace-jump-helm-line-background)
-        (avy-keys (or ace-jump-helm-line-keys
-                      avy-keys))
-        avy-all-windows
-        candidates)
+  (let (candidates)
     (save-excursion
       (save-restriction
         (narrow-to-region (window-start) (window-end (selected-window) t))
@@ -148,34 +196,55 @@ and `ace-jump-helm-line-background' instead.")
                           (helm-pos-candidate-separator-p))
                       (< (point) (point-max)))
             (forward-line 1)))))
-    (avy--process (nreverse candidates)
-                  (avy--style-fn
-                   (or ace-jump-helm-line-style
-                       avy-style)))))
+    (nreverse candidates)))
 
-;;;###autoload
-(defun ace-jump-helm-line ()
-  "Jump to a line in helm window."
-  (interactive)
+(defun ace-jump-helm-line--do ()
   (if helm-alive-p
-      (let ((orig-window (selected-window)))
+      (let* ((orig-window (selected-window))
+             (avy-background ace-jump-helm-line-background)
+             (avy-keys (or ace-jump-helm-line-keys
+                           avy-keys))
+             (avy-dispatch-alist (ace-jump-helm-line--get-dispatch-alist))
+             avy-action
+             avy-all-windows)
         (unwind-protect
             (with-selected-window (helm-window)
-              (ace-jump-helm-line--collect-lines)
-              (let ((orig-point (point)))
-                (helm-move-selection-common :where 'line :direction 'previous)
-                (unless (= (point) orig-point)
-                  (helm-move-selection-common :where 'line :direction 'next)))))
+              (avy--process (ace-jump-helm-line--collect-lines)
+                            (avy--style-fn
+                             (or ace-jump-helm-line-style
+                                 avy-style)))
+              (or avy-action
+                  (ace-jump-helm-line--move-selection))))
         (select-window orig-window))
     (error "No helm session is running")))
 
-;;; Inspired by http://rubikitch.com/f/150416044841.ace-jump-helm-line.1.el
+(defun ace-jump-helm-line--post ()
+  (and helm-alive-p
+       (eq ace-jump-helm-line-default-action
+           ace-jump-helm-line--action-type)
+       (cond
+        ((eq ace-jump-helm-line-default-action 'select)
+         (helm-maybe-exit-minibuffer))
+        ((eq ace-jump-helm-line-default-action 'persistent)
+         (helm-execute-persistent-action)))))
+
 ;;;###autoload
-(defun ace-jump-helm-line-execute-action ()
-  "Jump to a line and execute persistent action in helm window."
+(defun ace-jump-helm-line ()
+  "Jump to a candidate and execute the default action."
   (interactive)
-  (ace-jump-helm-line)
-  (helm-maybe-exit-minibuffer))
+  (let ((ace-jump-helm-line--action-type
+         ace-jump-helm-line-default-action))
+    (ace-jump-helm-line--do)
+    (ace-jump-helm-line--post)))
+
+;;;###autoload
+(defun ace-jump-helm-line-and-select ()
+  "Jump to and select the candidate in helm window."
+  (interactive)
+  (let ((ace-jump-helm-line-default-action 'select))
+    (ace-jump-helm-line)))
+
+(defalias 'ace-jump-helm-line-execute-action 'ace-jump-helm-line-and-select)
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

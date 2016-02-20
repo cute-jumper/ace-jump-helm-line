@@ -405,7 +405,10 @@ Used for `ace-jump-helm-line'.")
 
 (defun ace-jump-helm-line--do-if-empty ()
   (when (string-equal (minibuffer-contents) "")
-    (ace-jump-helm-line)))
+    (condition-case err
+        (ace-jump-helm-line)
+      (error
+       (message "%s" (error-message-string err))))))
 
 (defun ace-jump-helm-line--maybe (orig-func &rest args)
   (ace-jump-helm-line--with-helm-minibuffer-setup-hook

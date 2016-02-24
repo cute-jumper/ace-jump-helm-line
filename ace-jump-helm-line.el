@@ -163,6 +163,12 @@
 ;;   regardless of your default action since the variable corresponding to
 ;;   your default action will just be ignored.
 
+;;   If you wonder why this feature is useful, here is an example: if you use
+;;   `helm-find-files' and set the default action to be `select', you can now
+;;   use `ace-jump-helm-line-persistent-key' to complete the directory name
+;;   instead of opening the directory in dired. This means you can use
+;;   `ace-jump-helm-line' until you finally find the target file.
+
 ;;   For compatibility issues, there are also two identical pre-defined
 ;;   commands: `ace-jump-helm-line-and-select' and
 ;;   `ace-jump-helm-line-execute-action'. Their default action is to select

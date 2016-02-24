@@ -138,8 +138,8 @@
 ;;   For example, if we have following settings:
 ;;   ,----
 ;;   | (setq ace-jump-helm-line-default-action 'select)
-;;   | ;; The following line is not needed
-;;   | (setq ace-jump-helm-line-select-key ?e)
+;;   | (setq ace-jump-helm-line-select-key ?e) ;; this line is not neeeded
+;;   | ;; Set the move-only and persistent keys
 ;;   | (setq ace-jump-helm-line-move-only-key ?o)
 ;;   | (setq ace-jump-helm-line-persistent-key ?p)
 ;;   `----
@@ -215,8 +215,8 @@
 ;;   | (setq ace-jump-helm-line-style 'pre)
 ;;   | (setq ace-jump-helm-line-background t)
 ;;   | (setq ace-jump-helm-line-default-action 'select)
-;;   | ;; The following line is not needed
-;;   | (setq ace-jump-helm-line-select-key ?e)
+;;   | (setq ace-jump-helm-line-select-key ?e) ;; this line is not neeeded
+;;   | ;; Set the move-only and persistent keys
 ;;   | (setq ace-jump-helm-line-move-only-key ?o)
 ;;   | (setq ace-jump-helm-line-persistent-key ?p)
 ;;   | ;; enable idle execution for `helm-mini'

@@ -280,8 +280,10 @@
 
 (defvar ace-jump-helm-line-keys nil
   "Keys used for `ace-jump-helm-line'.")
+
 (defvar ace-jump-helm-line-style nil
   "Style used for `ace-jump-helm-line'.")
+
 (defvar ace-jump-helm-line-background nil
   "Use background or not in `ace-jump-helm-line'.")
 
@@ -368,10 +370,11 @@ Used for `ace-jump-helm-line'.")
             (setq max-height
                   (/ (* (frame-height) helm-autoresize-max-height) 100))
             (when (> win-height max-height)
-              (setq win-end (save-excursion
-                              (goto-char win-end)
-                              (forward-line (- max-height win-height))
-                              (line-beginning-position)))
+              (when (< max-height (ceiling (window-screen-lines)))
+                (setq win-end (save-excursion
+                                (goto-char win-end)
+                                (forward-line (- max-height win-height))
+                                (line-beginning-position))))
               (setq win-height max-height))
             (setq min-height
                   (/ (* (frame-height) helm-autoresize-min-height) 100))
@@ -468,6 +471,54 @@ Used for `ace-jump-helm-line'.")
                      #'ace-jump-helm-line--do-if-empty))
     (apply orig-func args)))
 
+(defun ace-jump-helm-line--update-line-overlays-maybe ()
+  (interactive)
+  (let (avy--leafs
+        avy-background
+        (avy-current-path ""))
+    (when helm-alive-p
+      (with-helm-window
+        (avy-traverse
+         (avy-tree (ace-jump-helm-line--collect-lines) avy-keys)
+         (lambda (path leaf)
+           (push (cons path leaf) avy--leafs)))
+        (setq ace-jump-helm-line--tree-leafs avy--leafs)
+        (if ace-jump-helm-line-autoshow-use-linum
+            (linum-update helm-buffer)
+          (avy--remove-leading-chars)
+          (dolist (x avy--leafs)
+            (funcall (avy--style-fn (or ace-jump-helm-line-style
+                                        avy-style))
+                     (car x) (cdr x))))))))
+
+(defun ace-jump-helm-line--cleanup-overlays ()
+  (with-helm-window (avy--done)))
+
+(defun ace-jump-helm-line--linum (line-number)
+  (when helm-alive-p
+    (let (fmt
+          (start-point (save-excursion
+                         (with-helm-buffer
+                           (goto-line line-number)
+                           (line-beginning-position)))))
+      (catch 'done
+        (dolist (elem ace-jump-helm-line--tree-leafs)
+          (when (= (nth 1 elem) start-point)
+            (setq fmt (mapconcat (lambda (x) (format "%c" x))
+                                 (reverse (car elem))
+                                 ""))
+            (throw 'done t))))
+      (setq fmt (and fmt (propertize fmt 'face 'avy-lead-face)))
+      (when (or avy-highlight-first (> (length fmt) 1))
+        (set-text-properties 0 1 '(face avy-lead-face-0) fmt))
+      (if fmt
+          (format "%3s" fmt)
+        (propertize "" 'invisible t)))))
+
+(defun turn-on-ace-jump-helm-line--linum ()
+  (with-helm-buffer
+    (linum-mode +1)))
+
 ;;;###autoload
 (defun ace-jump-helm-line ()
   "Jump to a candidate and execute the default action."
@@ -476,45 +527,6 @@ Used for `ace-jump-helm-line'.")
          ace-jump-helm-line-default-action))
     (ace-jump-helm-line--do)
     (ace-jump-helm-line--post)))
-
-(defun ace-jump-helm-line--update-line-overlays-maybe ()
-  (interactive)
-  (let (avy--leafs
-        avy-background
-        (avy-current-path ""))
-    (with-helm-window
-      (avy-traverse
-       (avy-tree (ace-jump-helm-line--collect-lines) avy-keys)
-       (lambda (path leaf)
-         (push (cons path leaf) avy--leafs)))
-      (setq ace-jump-helm-line--tree-leafs avy--leafs)
-      (unless ace-jump-helm-line-autoshow-use-linum
-        (avy--remove-leading-chars)
-        (dolist (x avy--leafs)
-          (funcall (avy--style-fn (or ace-jump-helm-line-style
-                                      avy-style))
-                   (car x) (cdr x)))))))
-
-(defun ace-jump-helm-line--cleanup-overlays ()
-  (with-helm-window (avy--done)))
-
-(defun ace-jump-helm-line--linum (line-number)
-  (let (fmt
-        (start-point (save-excursion
-                       (with-helm-buffer
-                         (goto-line line-number)
-                         (line-beginning-position)))))
-    (catch 'done
-      (dolist (elem ace-jump-helm-line--tree-leafs)
-        (when (= (nth 1 elem) start-point)
-          (setq fmt (mapconcat (lambda (x) (format "%c" x))
-                               (reverse (car elem))
-                               ""))
-          (throw 'done t))))
-    (setq fmt (and fmt (propertize fmt 'face 'avy-lead-face)))
-    (when (or avy-highlight-first (> (length fmt) 1))
-      (set-text-properties 0 1 '(face avy-lead-face-0) fmt))
-    fmt))
 
 ;;;###autoload
 (defun ace-jump-helm-line-and-select ()
@@ -534,37 +546,47 @@ Used for `ace-jump-helm-line'.")
 (defun ace-jump-helm-line-idle-exec-remove (func)
   (advice-remove func #'ace-jump-helm-line--maybe))
 
-(defun turn-on-ace-jump-helm-line--linum ()
-  (with-helm-buffer
-    (linum-mode +1)))
-
 ;;;###autoload
 (define-minor-mode ace-jump-helm-line-autoshow-mode
   "Automatically show line labels in `helm'."
   :global t
   (if ace-jump-helm-line-autoshow-mode
       (progn
-        (add-hook 'helm-move-selection-before-hook
+        (add-hook 'helm-after-preselection-hook
                   'ace-jump-helm-line--update-line-overlays-maybe)
         (add-hook 'helm-move-selection-after-hook
                   'ace-jump-helm-line--update-line-overlays-maybe)
         (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
         (add-hook 'helm-after-update-hook
                   'ace-jump-helm-line--update-line-overlays-maybe)
+        (add-hook 'helm-update-hook
+                  'ace-jump-helm-line--update-line-overlays-maybe)
+        (add-hook 'helm-window-configuration-hook
+                  'ace-jump-helm-line--update-line-overlays-maybe)
+        (add-hook 'helm-autoresize-mode-hook
+                  'ace-jump-helm-line--update-line-overlays-maybe)
         (when ace-jump-helm-line-autoshow-use-linum
           (setq ace-jump-helm-line--original-linum-format linum-format)
           (setq linum-format 'ace-jump-helm-line--linum)
           (add-hook 'helm-after-initialize-hook 'turn-on-ace-jump-helm-line--linum)))
-    (remove-hook 'helm-move-selection-before-hook
+    (remove-hook 'helm-after-preselection-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
     (remove-hook 'helm-move-selection-after-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
     (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
     (remove-hook 'helm-after-update-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
+    (remove-hook 'helm-update-hook
+                 'ace-jump-helm-line--update-line-overlays-maybe)
+    (remove-hook 'helm-window-configuration-hook
+                 'ace-jump-helm-line--update-line-overlays-maybe)
+    (remove-hook 'helm-autoresize-mode-hook
+                 'ace-jump-helm-line--update-line-overlays-maybe)
     (when ace-jump-helm-line-autoshow-use-linum
       (setq linum-format ace-jump-helm-line--original-linum-format)
-      (remove-hook 'helm-after-initialize-hook 'turn-on-ace-jump-helm-line--linum))))
+      (remove-hook 'helm-after-initialize-hook 'turn-on-ace-jump-helm-line--linum)
+      (with-helm-window
+        (linum-mode -1)))))
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

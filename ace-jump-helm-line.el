@@ -326,7 +326,9 @@ Used for `ace-jump-helm-line'.")
   (ace-jump-helm-line--move-selection))
 
 (defun ace-jump-helm-line--move-selection ()
-  (let ((orig-point (point)))
+  (let (helm-after-preselection-hook
+        helm-move-selection-after-hook
+        (orig-point (point)))
     (helm-move-selection-common :where 'line :direction 'previous)
     (unless (= (point) orig-point)
       (helm-move-selection-common :where 'line :direction 'next))))
@@ -408,8 +410,10 @@ Used for `ace-jump-helm-line'.")
                              (or ace-jump-helm-line-style
                                  avy-style)))
               (or avy-action
-                  (ace-jump-helm-line--move-selection))))
-        (select-window orig-window))
+                  (ace-jump-helm-line--move-selection)))
+          (when ace-jump-helm-line-autoshow-mode
+            (ace-jump-helm-line--update-line-overlays))
+          (select-window orig-window)))
     (error "No helm session is running")))
 
 (defun ace-jump-helm-line--post ()
@@ -460,6 +464,25 @@ Used for `ace-jump-helm-line'.")
     (ace-jump-helm-line--do)
     (ace-jump-helm-line--post)))
 
+(defun ace-jump-helm-line--update-line-overlays ()
+  (interactive)
+  (let (avy--leafs
+        avy-background
+        (avy-current-path ""))
+    (with-helm-window
+      (avy-traverse
+       (avy-tree (ace-jump-helm-line--collect-lines) avy-keys)
+       (lambda (path leaf)
+         (push (cons path leaf) avy--leafs)))
+      (avy--remove-leading-chars)
+      (dolist (x avy--leafs)
+        (funcall (avy--style-fn (or ace-jump-helm-line-style
+                                    avy-style))
+                 (car x) (cdr x))))))
+
+(defun ace-jump-helm-line--cleanup-overlays ()
+  (with-helm-window (avy--done)))
+
 ;;;###autoload
 (defun ace-jump-helm-line-and-select ()
   "Jump to and select the candidate in helm window."
@@ -477,6 +500,24 @@ Used for `ace-jump-helm-line'.")
 ;;;###autoload
 (defun ace-jump-helm-line-idle-exec-remove (func)
   (advice-remove func #'ace-jump-helm-line--maybe))
+
+;;;###autoload
+(define-minor-mode ace-jump-helm-line-autoshow-mode
+  "Automatically show line labels in `helm'."
+  :global t
+  (if ace-jump-helm-line-autoshow-mode
+      (progn
+        (add-hook 'helm-move-selection-before-hook
+                  'ace-jump-helm-line--update-line-overlays)
+        (add-hook 'helm-move-selection-after-hook
+                  'ace-jump-helm-line--update-line-overlays)
+        (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays))
+    (remove-hook 'helm-move-selection-before-hook
+                 'ace-jump-helm-line--update-line-overlays)
+    (remove-hook 'helm-move-selection-after-hook
+                 'ace-jump-helm-line--update-line-overlays)
+    (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)))
+
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

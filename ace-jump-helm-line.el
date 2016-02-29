@@ -491,10 +491,12 @@ Used for `ace-jump-helm-line'.")
 (defun ace-jump-helm-line--linum (line-number)
   (when helm-alive-p
     (let (fmt
-          (start-point (save-excursion
-                         (with-helm-window
-                           (goto-line line-number)
-                           (line-beginning-position)))))
+          (start-point
+           (save-excursion
+             (with-helm-window
+               (save-excursion
+                 (goto-line line-number)
+                 (line-beginning-position))))))
       (catch 'done
         (dolist (elem ace-jump-helm-line--tree-leafs)
           (when (= (nth 1 elem) start-point)

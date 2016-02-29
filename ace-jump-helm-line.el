@@ -318,6 +318,8 @@ Used for `ace-jump-helm-line'.")
 
 (defvar ace-jump-helm-line--action-type nil)
 
+(defvar ace-jump-helm-line--last-win-start -1)
+
 (defun ace-jump-helm-line-action-persistent (pt)
   (goto-char pt)
   (setq ace-jump-helm-line--action-type 'persistent)
@@ -356,54 +358,42 @@ Used for `ace-jump-helm-line'.")
           (eval `(and ,key-sym
                       (push (cons ,key-sym ',action-sym) dispatch-alist))))))))
 
-(defun ace-jump-helm-line--collect-lines ()
+(defun ace-jump-helm-line--collect-lines (win-start &optional win-end)
   "Collect lines in helm window."
-  (let (candidates)
-    (save-excursion
-      (save-restriction
-        (let ((win-height (window-height))
-              (win-start (window-start))
-              (win-end (window-end (selected-window) t))
-              max-height
-              min-height)
-          (when helm-autoresize-mode
-            (setq max-height
-                  (/ (* (frame-height) helm-autoresize-max-height) 100))
-            (when (> win-height max-height)
-              (when (< max-height (ceiling (window-screen-lines)))
-                (setq win-end (save-excursion
-                                (goto-char win-end)
-                                (forward-line (- max-height win-height))
-                                (line-beginning-position))))
-              (setq win-height max-height))
-            (setq min-height
-                  (/ (* (frame-height) helm-autoresize-min-height) 100))
-            (when (< win-height min-height)
-              (setq win-height min-height)))
-          (when (> (window-header-line-height) 0)
-            (setq win-height (1- win-height)))
-          (when (> (window-mode-line-height) 0)
-            (setq win-height (1- win-height)))
-          (when (>= (point) win-end)
-            (setq win-end (line-beginning-position 2))
-            (setq win-start (line-beginning-position (- 2 win-height))))
-          (when (<= (point) win-start)
-            (setq win-start (point))
-            (setq win-end (line-beginning-position (1+ win-height))))
-          (narrow-to-region win-start win-end)
-          (goto-char (point-min))
-          (while (or (helm-pos-header-line-p)
-                     (helm-pos-candidate-separator-p))
-            (forward-line 1))
-          (while (< (point) (point-max))
-            (push (cons (point) (selected-window))
-                  candidates)
-            (forward-line 1)
-            (while (and (or (helm-pos-header-line-p)
-                            (helm-pos-candidate-separator-p))
-                        (< (point) (point-max)))
-              (forward-line 1)))))
-      (nreverse candidates))))
+  (save-excursion
+    (save-restriction
+      (let ((win-end (or win-end
+                         (save-excursion
+                           (goto-char win-start)
+                           (forward-line
+                            (ceiling (window-screen-lines)))
+                           (line-beginning-position))))
+            candidates)
+        (setq ace-jump-helm-line--last-win-start win-start)
+        (narrow-to-region win-start win-end)
+        (goto-char (point-min))
+        (while (or (helm-pos-header-line-p)
+                   (helm-pos-candidate-separator-p))
+          (forward-line 1))
+        (while (< (point) (point-max))
+          (push (cons (point) (selected-window))
+                candidates)
+          (forward-line 1)
+          (while (and (or (helm-pos-header-line-p)
+                          (helm-pos-candidate-separator-p))
+                      (< (point) (point-max)))
+            (forward-line 1)))
+        (nreverse candidates)))))
+
+(defun ace-jump-helm-line--scroll-function (win start-pos)
+  (unless (= ace-jump-helm-line--last-win-start start-pos)
+    (setq ace-jump-helm-line--last-win-start start-pos)
+    (ace-jump-helm-line--update-line-overlays-maybe start-pos)))
+
+(defun ace-jump-helm-line--add-scroll-function ()
+  (with-helm-buffer
+    (add-hook 'window-scroll-functions
+              'ace-jump-helm-line--scroll-function nil t)))
 
 (defun ace-jump-helm-line--do ()
   (if helm-alive-p
@@ -419,7 +409,8 @@ Used for `ace-jump-helm-line'.")
               (and ace-jump-helm-line-autoshow-mode
                    ace-jump-helm-line-autoshow-use-linum
                    (linum-mode -1))
-              (avy--process (ace-jump-helm-line--collect-lines)
+              (avy--process (ace-jump-helm-line--collect-lines
+                             (window-start) (window-end (selected-window) t))
                             (avy--style-fn
                              (or ace-jump-helm-line-style
                                  avy-style)))
@@ -471,7 +462,7 @@ Used for `ace-jump-helm-line'.")
                      #'ace-jump-helm-line--do-if-empty))
     (apply orig-func args)))
 
-(defun ace-jump-helm-line--update-line-overlays-maybe ()
+(defun ace-jump-helm-line--update-line-overlays-maybe (&optional win-start)
   (interactive)
   (let (avy--leafs
         avy-background
@@ -479,7 +470,10 @@ Used for `ace-jump-helm-line'.")
     (when helm-alive-p
       (with-helm-window
         (avy-traverse
-         (avy-tree (ace-jump-helm-line--collect-lines) avy-keys)
+         (avy-tree (ace-jump-helm-line--collect-lines
+                    (or win-start (window-start))
+                    (and (not win-start) (window-end (selected-window) t)))
+                   avy-keys)
          (lambda (path leaf)
            (push (cons path leaf) avy--leafs)))
         (setq ace-jump-helm-line--tree-leafs avy--leafs)
@@ -498,7 +492,7 @@ Used for `ace-jump-helm-line'.")
   (when helm-alive-p
     (let (fmt
           (start-point (save-excursion
-                         (with-helm-buffer
+                         (with-helm-window
                            (goto-line line-number)
                            (line-beginning-position)))))
       (catch 'done
@@ -556,37 +550,29 @@ Used for `ace-jump-helm-line'.")
                   'ace-jump-helm-line--update-line-overlays-maybe)
         (add-hook 'helm-move-selection-after-hook
                   'ace-jump-helm-line--update-line-overlays-maybe)
-        (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
         (add-hook 'helm-after-update-hook
-                  'ace-jump-helm-line--update-line-overlays-maybe)
-        (add-hook 'helm-update-hook
-                  'ace-jump-helm-line--update-line-overlays-maybe)
-        (add-hook 'helm-window-configuration-hook
-                  'ace-jump-helm-line--update-line-overlays-maybe)
-        (add-hook 'helm-autoresize-mode-hook
-                  'ace-jump-helm-line--update-line-overlays-maybe)
+                  'ace-jump-helm-line--update-line-overlays-maybe t)
+        (add-hook 'helm-after-initialize-hook
+                  'ace-jump-helm-line--add-scroll-function)
+        (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
         (when ace-jump-helm-line-autoshow-use-linum
           (setq ace-jump-helm-line--original-linum-format linum-format)
           (setq linum-format 'ace-jump-helm-line--linum)
-          (add-hook 'helm-after-initialize-hook 'turn-on-ace-jump-helm-line--linum)))
+          (add-hook 'helm-after-initialize-hook
+                    'turn-on-ace-jump-helm-line--linum)))
     (remove-hook 'helm-after-preselection-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
     (remove-hook 'helm-move-selection-after-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
-    (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
     (remove-hook 'helm-after-update-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
-    (remove-hook 'helm-update-hook
-                 'ace-jump-helm-line--update-line-overlays-maybe)
-    (remove-hook 'helm-window-configuration-hook
-                 'ace-jump-helm-line--update-line-overlays-maybe)
-    (remove-hook 'helm-autoresize-mode-hook
-                 'ace-jump-helm-line--update-line-overlays-maybe)
+    (remove-hook 'helm-after-initialize-hook
+                 'ace-jump-helm-line--add-scroll-function)
+    (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
     (when ace-jump-helm-line-autoshow-use-linum
       (setq linum-format ace-jump-helm-line--original-linum-format)
-      (remove-hook 'helm-after-initialize-hook 'turn-on-ace-jump-helm-line--linum)
-      (with-helm-window
-        (linum-mode -1)))))
+      (remove-hook 'helm-after-initialize-hook
+                   'turn-on-ace-jump-helm-line--linum))))
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

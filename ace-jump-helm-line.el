@@ -476,7 +476,7 @@ Used for `ace-jump-helm-line'.")
          (avy-tree (ace-jump-helm-line--collect-lines
                     (or win-start (window-start))
                     (and (not win-start) (window-end (selected-window) t)))
-                   avy-keys)
+                   (or ace-jump-helm-line-keys avy-keys))
          (lambda (path leaf)
            (push (cons path leaf) avy--leafs)))
         (setq ace-jump-helm-line--tree-leafs avy--leafs)

@@ -315,6 +315,8 @@ Used for `ace-jump-helm-line'.")
 (defvar ace-jump-helm-line--tree-leafs nil)
 
 (defvar ace-jump-helm-line--original-linum-format nil)
+(unless ace-jump-helm-line--original-linum-format
+  (setq ace-jump-helm-line--original-linum-format linum-format))
 
 (defvar ace-jump-helm-line--action-type nil)
 
@@ -340,6 +342,7 @@ Used for `ace-jump-helm-line'.")
 (defun ace-jump-helm-line--move-selection ()
   (let (helm-after-preselection-hook
         helm-move-selection-after-hook
+        helm-after-update-hook
         (orig-point (point)))
     (helm-move-selection-common :where 'line :direction 'previous)
     (unless (= (point) orig-point)
@@ -512,8 +515,9 @@ Used for `ace-jump-helm-line'.")
         (propertize "" 'invisible t)))))
 
 (defun turn-on-ace-jump-helm-line--linum ()
-  (with-helm-buffer
-    (linum-mode +1)))
+  (when ace-jump-helm-line-autoshow-use-linum
+    (with-helm-buffer
+      (linum-mode +1))))
 
 ;;;###autoload
 (defun ace-jump-helm-line ()
@@ -557,11 +561,11 @@ Used for `ace-jump-helm-line'.")
         (add-hook 'helm-after-initialize-hook
                   'ace-jump-helm-line--add-scroll-function)
         (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
-        (when ace-jump-helm-line-autoshow-use-linum
-          (setq ace-jump-helm-line--original-linum-format linum-format)
-          (setq linum-format 'ace-jump-helm-line--linum)
-          (add-hook 'helm-after-initialize-hook
-                    'turn-on-ace-jump-helm-line--linum)))
+        ;; hooks for linum
+        (setq ace-jump-helm-line--original-linum-format linum-format)
+        (setq linum-format 'ace-jump-helm-line--linum)
+        (add-hook 'helm-after-initialize-hook
+                  'turn-on-ace-jump-helm-line--linum))
     (remove-hook 'helm-after-preselection-hook
                  'ace-jump-helm-line--update-line-overlays-maybe)
     (remove-hook 'helm-move-selection-after-hook
@@ -571,10 +575,10 @@ Used for `ace-jump-helm-line'.")
     (remove-hook 'helm-after-initialize-hook
                  'ace-jump-helm-line--add-scroll-function)
     (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
-    (when ace-jump-helm-line-autoshow-use-linum
-      (setq linum-format ace-jump-helm-line--original-linum-format)
-      (remove-hook 'helm-after-initialize-hook
-                   'turn-on-ace-jump-helm-line--linum))))
+    ;; hooksf for linum
+    (setq linum-format ace-jump-helm-line--original-linum-format)
+    (remove-hook 'helm-after-initialize-hook
+                 'turn-on-ace-jump-helm-line--linum)))
 
 (make-obsolete-variable 'ace-jump-helm-line-use-avy-style nil "0.4")
 

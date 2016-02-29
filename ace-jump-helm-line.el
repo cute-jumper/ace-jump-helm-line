@@ -517,6 +517,8 @@ Used for `ace-jump-helm-line'.")
 (defun turn-on-ace-jump-helm-line--linum ()
   (when ace-jump-helm-line-autoshow-use-linum
     (with-helm-buffer
+      (set (make-local-variable 'linum-format)
+           'ace-jump-helm-line--linum)
       (linum-mode +1))))
 
 ;;;###autoload
@@ -562,8 +564,6 @@ Used for `ace-jump-helm-line'.")
                   'ace-jump-helm-line--add-scroll-function)
         (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
         ;; hooks for linum
-        (setq ace-jump-helm-line--original-linum-format linum-format)
-        (setq linum-format 'ace-jump-helm-line--linum)
         (add-hook 'helm-after-initialize-hook
                   'turn-on-ace-jump-helm-line--linum))
     (remove-hook 'helm-after-preselection-hook
@@ -576,7 +576,6 @@ Used for `ace-jump-helm-line'.")
                  'ace-jump-helm-line--add-scroll-function)
     (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
     ;; hooksf for linum
-    (setq linum-format ace-jump-helm-line--original-linum-format)
     (remove-hook 'helm-after-initialize-hook
                  'turn-on-ace-jump-helm-line--linum)))
 

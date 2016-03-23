@@ -415,13 +415,13 @@ Used for `ace-jump-helm-line'.")
               (and ace-jump-helm-line-autoshow-mode
                    ace-jump-helm-line-autoshow-use-linum
                    (linum-mode -1))
-              (avy--process (ace-jump-helm-line--collect-lines
-                             (window-start) (window-end (selected-window) t))
-                            (avy--style-fn
-                             (or ace-jump-helm-line-style
-                                 avy-style)))
-              (or avy-action
-                  (ace-jump-helm-line--move-selection)))
+              (and (numberp
+                    (avy--process (ace-jump-helm-line--collect-lines
+                                   (window-start)
+                                   (window-end (selected-window) t))
+                                  (avy--style-fn avy-style)))
+                   (or avy-action
+                       (ace-jump-helm-line--exec-default-action))))
           (when ace-jump-helm-line-autoshow-mode
             (when ace-jump-helm-line-autoshow-use-linum
               (turn-on-ace-jump-helm-line--linum))
@@ -429,15 +429,16 @@ Used for `ace-jump-helm-line'.")
           (select-window orig-window)))
     (error "No helm session is running")))
 
-(defun ace-jump-helm-line--post ()
-  (and helm-alive-p
-       (eq ace-jump-helm-line-default-action
-           ace-jump-helm-line--action-type)
-       (cond
-        ((eq ace-jump-helm-line-default-action 'select)
-         (helm-maybe-exit-minibuffer))
-        ((eq ace-jump-helm-line-default-action 'persistent)
-         (helm-execute-persistent-action)))))
+(defun ace-jump-helm-line--exec-default-action ()
+  (when (and helm-alive-p
+             (eq ace-jump-helm-line-default-action
+                 ace-jump-helm-line--action-type))
+    (ace-jump-helm-line--move-selection)
+    (cond
+     ((eq ace-jump-helm-line-default-action 'select)
+      (helm-exit-minibuffer))
+     ((eq ace-jump-helm-line-default-action 'persistent)
+      (helm-execute-persistent-action)))))
 
 (defmacro ace-jump-helm-line--with-helm-minibuffer-setup-hook (fun &rest body)
   "Temporarily add FUN to `helm-minibuffer-set-up-hook' while executing BODY."
@@ -544,8 +545,7 @@ Used for `ace-jump-helm-line'.")
   (interactive)
   (let ((ace-jump-helm-line--action-type
          ace-jump-helm-line-default-action))
-    (ace-jump-helm-line--do)
-    (ace-jump-helm-line--post)))
+    (ace-jump-helm-line--do)))
 
 ;;;###autoload
 (defun ace-jump-helm-line-and-select ()

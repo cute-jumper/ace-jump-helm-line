@@ -405,6 +405,9 @@ Used for `ace-jump-helm-line'.")
              (avy-keys (or ace-jump-helm-line-keys
                            avy-keys))
              (avy-dispatch-alist (ace-jump-helm-line--get-dispatch-alist))
+             (avy-style
+              (or ace-jump-helm-line-style
+                  avy-style))
              avy-action
              avy-all-windows)
         (unwind-protect
@@ -469,23 +472,37 @@ Used for `ace-jump-helm-line'.")
   (interactive)
   (let (avy--leafs
         avy-background
-        (avy-current-path ""))
+        (avy-current-path "")
+        (avy-style (or ace-jump-helm-line-style
+                       avy-style))
+        candidates
+        (keys (or ace-jump-helm-line-keys avy-keys)))
     (when helm-alive-p
       (with-helm-window
-        (avy-traverse
-         (avy-tree (ace-jump-helm-line--collect-lines
-                    (or win-start (window-start))
-                    (and (not win-start) (window-end (selected-window) t)))
-                   (or ace-jump-helm-line-keys avy-keys))
-         (lambda (path leaf)
-           (push (cons path leaf) avy--leafs)))
+        (setq candidates (ace-jump-helm-line--collect-lines
+                          (or win-start (window-start))
+                          (and (not win-start) (window-end (selected-window) t))))
+        (if (eq avy-style 'de-bruijn)
+            (let* ((path-len (ceiling (log (length candidates) (length keys))))
+                   (alist (avy--path-alist-1 candidates path-len keys)))
+              (while (not alist)
+                (cl-incf path-len)
+                (setq alist (avy--path-alist-1 lst path-len keys)))
+              (setq avy--leafs
+                    (reverse
+                     (mapcar
+                      (lambda (x) (cons (reverse (car x)) (cdr x)))
+                      alist))))
+          (avy-traverse
+           (avy-tree candidates keys)
+           (lambda (path leaf)
+             (push (cons path leaf) avy--leafs))))
         (setq ace-jump-helm-line--tree-leafs avy--leafs)
         (if ace-jump-helm-line-autoshow-use-linum
             (linum-update helm-buffer)
           (avy--remove-leading-chars)
           (dolist (x avy--leafs)
-            (funcall (avy--style-fn (or ace-jump-helm-line-style
-                                        avy-style))
+            (funcall (avy--style-fn avy-style)
                      (car x) (cdr x))))))))
 
 (defun ace-jump-helm-line--cleanup-overlays ()

@@ -122,6 +122,18 @@ This package makes use of the =avy.el=.
    command, the implementation is a simple yet dirty hack. And don't try to set
    the value of =ace-jump-helm-line-idle-delay= to be =nil=. It doesn't work.
 
+** Line Hints Preview
+   You can preview the line hints without invoking =ace-jump-helm-line= by
+   enabling =ace-jump-helm-line-autoshow-mode=. This is similar to =linum-mode=.
+   With =avy-style= set to =at-full=, the result is shown below:
+   [[./screencasts/autoshow.png]]
+
+   Or if you may prefer to show the hints using =linum-mode=, you can set
+   =ace-jump-helm-line-autoshow-use-linum= to =t=:
+   : (setq ace-jump-helm-line-autoshow-use-linum t)
+
+   The result:
+   [[./screencasts/autoshow-linum.png]]
 * Example settings
   : (eval-after-load "helm"
   : '(define-key helm-map (kbd "C-'") 'ace-jump-helm-line))

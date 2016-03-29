@@ -39,6 +39,7 @@
 ;; .. 2.1 Keys & UI
 ;; .. 2.2 Different Actions: move-only, persistent or select
 ;; .. 2.3 Automatic Idle Execution
+;; .. 2.4 Line Hints Preview
 ;; 3 Example settings
 ;; 4 Demos(only showing the basic feature)
 ;; 5 Similar Package
@@ -207,6 +208,24 @@
 ;;   to a helm command, the implementation is a simple yet dirty hack. And
 ;;   don't try to set the value of `ace-jump-helm-line-idle-delay' to be
 ;;   `nil'. It doesn't work.
+
+
+;; 2.4 Line Hints Preview
+;; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+;;   You can preview the line hints without invoking `ace-jump-helm-line' by
+;;   enabling `ace-jump-helm-line-autoshow-mode'. This is similar to `linum-mode'.
+;;   With `avy-style' set to `at-full', the result is shown below:
+;;   https://github.com/cute-jumper/ace-jump-helm-line/screencasts/autoshow.png
+
+;;   Or if you may prefer to show the hints using `linum-mode', you can set
+;;   `ace-jump-helm-line-autoshow-use-linum' to `t':
+;;   ,----
+;;   | (setq ace-jump-helm-line-autoshow-use-linum t)
+;;   `----
+
+;;   The result:
+;;   https://github.com/cute-jumper/ace-jump-helm-line/screencasts/autoshow-linum.png
 
 
 ;; 3 Example settings

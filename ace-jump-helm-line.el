@@ -602,7 +602,7 @@ Used for `ace-jump-helm-line'.")
                   'ace-jump-helm-line--update-line-overlays-maybe t)
         (add-hook 'helm-after-initialize-hook
                   'ace-jump-helm-line--add-scroll-function)
-        (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
+        ;; (add-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
         ;; hooks for linum
         (add-hook 'helm-after-initialize-hook
                   'turn-on-ace-jump-helm-line--linum))
@@ -614,7 +614,7 @@ Used for `ace-jump-helm-line'.")
                  'ace-jump-helm-line--update-line-overlays-maybe)
     (remove-hook 'helm-after-initialize-hook
                  'ace-jump-helm-line--add-scroll-function)
-    (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
+    ;; (remove-hook 'helm-cleanup-hook 'ace-jump-helm-line--cleanup-overlays)
     ;; hooksf for linum
     (remove-hook 'helm-after-initialize-hook
                  'turn-on-ace-jump-helm-line--linum)))

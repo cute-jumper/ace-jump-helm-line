@@ -439,7 +439,7 @@ Used for `ace-jump-helm-line'.")
                    ace-jump-helm-line-autoshow-use-linum
                    (linum-mode -1))
               (and (numberp
-                    (avy--process (ace-jump-helm-line--collect-lines
+                    (avy-process (ace-jump-helm-line--collect-lines
                                    (window-start)
                                    (window-end (selected-window) t))
                                   (avy--style-fn avy-style)))
